@@ -42,7 +42,7 @@ index.html & style.css: Interactive dashboard to monitor EEG states and predicti
 🛠 Installation & Usage
 Clone the repo:
 
-git clone https://github.com/berkayyayla1/Neuroheadstate-EEG-Analysis.git
+[git clone https://github.com/berkayyayla1/Neuroheadstate-EEG-Analysis.git](https://github.com/berkayayla1/Neuroheadstate-EEG-Analysis.git)
 
 Install dependencies:
 
