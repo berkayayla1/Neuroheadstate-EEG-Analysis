@@ -20,3 +20,5 @@ Framework: FastAPI
 Libraries: Scikit-learn, Pandas, NumPy, Joblib, Pydantic
 
 Frontend: JavaScript, HTML
+
+Data Visualization: Included a PCA-based dimensionality reduction script to visualize the 14-dimensional EEG data distribution in a 2D space.
