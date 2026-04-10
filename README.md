@@ -6,7 +6,7 @@ This project classifies eye states (Open/Closed) and Neuro-States from 14-channe
 🚀 Features
 Real-time Prediction: Low-latency FastAPI RESTful API for instant state classification.
 
-High Accuracy: Achieved 95.8% accuracy using the Label Spreading algorithm.
+High Accuracy: Achieved 96.8% accuracy using the Label Spreading algorithm.
 
 Signal Validation: Validated using the Berger Effect (Alpha Rhythm) and Power Spectral Density (PSD) analysis.
 
