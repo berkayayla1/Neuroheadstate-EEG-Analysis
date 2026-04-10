@@ -31,7 +31,7 @@ train_model.py: Script to preprocess data and train the Label Spreading model.
 
 calculate_metrics.py: Evaluation script to calculate accuracy, precision, and recall.
 
-data_visualization.py: Performs PCA to visualize 14D EEG data in 2D space.
+data_visualization.py: Performs PCA to visualize 14 EEG data in 2D space.
 
 predict_test.py: A sanity check script for testing the model with single data points.
 
