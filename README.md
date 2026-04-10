@@ -23,6 +23,8 @@ Frontend: JavaScript, HTML
 
 Data Visualization: Included a PCA-based dimensionality reduction script to visualize the 14-dimensional EEG data distribution in a 2D space.
 
+📁 Project Structure
+
 main.py: FastAPI RESTful API that handles real-time inference requests.
 
 train_model.py: Script to preprocess data and train the Label Spreading model.
