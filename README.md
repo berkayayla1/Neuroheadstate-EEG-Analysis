@@ -39,6 +39,8 @@ model.pkl: The trained serialized model file.
 
 index.html & style.css: Interactive dashboard to monitor EEG states and predictions.
 
+train.csv & test.csv: Dataset files used for training and evaluation.
+
 🛠 Installation & Usage
 Clone the repo:
 
@@ -51,5 +53,3 @@ pip install -r requirements.txt
 Run the API:
 
 uvicorn main:app --reload
-
-train.csv & test.csv: Dataset files used for training and evaluation.
