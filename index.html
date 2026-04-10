@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EyeProject Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="main-wrapper">
+    
+    <div class="column-left">
+        <details class="card" id="dataset-box" open>
+            <summary>📉 Dataset & Sensor Overview</summary>
+            <div class="details-content">
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <div style="flex: 1;">
+                        <div class="neuro-item"><strong>Total Samples:</strong> <span id="ds-total">Loading...</span></div>
+                        <div class="neuro-item"><strong>Eye Open (0):</strong> <span id="ds-open">...</span></div>
+                        <div class="neuro-item"><strong>Eye Closed (1):</strong> <span id="ds-closed">...</span></div>
+                        <div class="neuro-item"><strong>Sensors:</strong> <span>14 Channels</span></div>
+                        <div class="neuro-item"><strong>Sampling:</strong> <span>128 Hz (Standard)</span></div>
+                    </div>
+                    <div style="width: 100px; height: 100px;">
+                        <canvas id="datasetChart"></canvas>
+                    </div>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <details class="sub-details">
+                    <summary class="sub-summary">🧠 Sensor Topology (10-20 System)</summary>
+                    <div class="sub-content">
+                        <p style="margin-bottom: 10px;">
+                            The 10-20 system is a standardized method for electrode placement. "10" and "20" refer to the percentages of the distance between 
+                            <b>Nasion</b> (bridge of nose), <b>Inion</b> (bump at back of skull), and <b>Pre-auricular points</b> (front of the ears).
+                        </p>
+                        <details class="sub-details"><summary class="sub-summary" style="color:#3498db;">🟦 Frontal Lobe</summary><div class="sub-content"><strong>Sensors:</strong> <span style="color:#3498db; font-weight:bold;">AF3, F7, F3, FC5, FC6, F4, F8, AF4</span> <br><strong>Function:</strong> Associated with the Dorsolateral Prefrontal Cortex (DLPFC). Responsible for executive functions, decision making, and attention.</div></details>
+                        <details class="sub-details"><summary class="sub-summary" style="color:#e67e22;">🟧 Temporal Lobe</summary><div class="sub-content"><strong>Sensors:</strong> <span style="color:#e67e22; font-weight:bold;">T7, T8 (Also known as T3, T4)</span> <br><strong>Function:</strong> Located above the Superior Temporal Gyrus. Involved in auditory processing and language comprehension.</div></details>
+                        <details class="sub-details"><summary class="sub-summary" style="color:#9b59b6;">🟪 Parietal Lobe</summary><div class="sub-content"><strong>Sensors:</strong> <span style="color:#9b59b6; font-weight:bold;">P7, P8</span> <br><strong>Function:</strong> Linked to the Inferior Parietal Lobe. Plays a key role in sensory integration and visuospatial attention.</div></details>
+                        <details class="sub-details"><summary class="sub-summary" style="color:#e74c3c;">🟥 Occipital Lobe</summary><div class="sub-content"><strong>Sensors:</strong> <span style="color:#e74c3c; font-weight:bold;">O1, O2</span> <br><strong>Function:</strong> Visual processing center. This is the primary source of Alpha waves (Berger Effect) which increase significantly when eyes are closed.</div></details>
+                        <div style="margin-top: 10px; font-size: 9px; color: #888; border-top: 1px dashed #ddd; padding-top: 5px;">
+                            <strong>Refs:</strong> <br>
+                            1. Morley et al., "10-20 system EEG Placement", ERS (2016). <br>
+                            2. Herwig et al., "Using the international 10-20 EEG system for positioning of transcranial magnetic stimulation.", Brain Topography. (2003).
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </details>
+    </div>
+
+    <div class="column-middle">
+        <div class="card" style="padding: 25px;">
+            <h1>👁️  EEG Neuro-State Analysis</h1>
+            <p>Live EEG Analysis Module</p>
+            <form id="predict-form" onsubmit="predictData(event)">
+                <div class="input-grid">
+                    <input type="number" step="any" name="AF3" placeholder="AF3" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="F7" placeholder="F7" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="F3" placeholder="F3" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="FC5" placeholder="FC5" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="T7" placeholder="T7" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="P7" placeholder="P7" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="O1" placeholder="O1" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="O2" placeholder="O2" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="P8" placeholder="P8" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="T8" placeholder="T8" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="FC6" placeholder="FC6" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="F4" placeholder="F4" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="F8" placeholder="F8" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                    <input type="number" step="any" name="AF4" placeholder="AF4" required oninvalid="setValidationMsg(this)" oninput="this.setCustomValidity('')" onkeydown="preventSymbols(event)">
+                </div>
+                <button type="submit" class="btn-predict">ANALYZE SIGNAL</button>
+            </form>
+            <div id="predict-result-box" class="result-box" style="display: none;">
+                <h3 id="result-title">Prediction Result:</h3>
+                <h1 id="predict-text"></h1>
+                <div style="margin-top:5px; font-size:12px; color:#555;">
+                    <span id="model-used-text"></span> 
+                    <span id="time-taken-text" style="margin-left: 10px; font-weight: bold;"></span>
+                </div>
+            </div>
+            <div id="neuro-report" class="neuro-box" style="display: none;">
+                <h4>🧠 Neuro-State Analysis</h4>
+                <div class="neuro-item"><strong>Mental State:</strong> <span id="neuro-state-text">Loading...</span></div>
+                <div class="neuro-item" style="justify-content: flex-start; gap: 5px;"><strong>Description:</strong> <span id="state-desc-text" style="font-style: italic;">...</span></div>
+                <div class="neuro-item"><strong>Avg Voltage:</strong> <span id="voltage-text">0 µV</span></div>
+                <div id="signal-warning-box" class="warning-box" style="display: none;"><i class="fas fa-exclamation-triangle"></i> <span id="signal-warning-text"></span></div>
+                <div class="ref-footer" style="font-size: 9px; color: #777; margin-top: 10px;">
+                    Ref: Barry et al., "EEG differences between eyes-closed and eyes-open resting conditions", Clinical Neurophysiology. 2007.
+                </div>
+            </div>
+        </div>
+
+        <details class="card" id="history-box" open>
+            <summary>🕒 Last 5 Predictions</summary>
+            <div class="details-content">
+                <table class="styled-table">
+                    <thead><tr><th>Time</th><th>Model</th><th>Result</th><th style="text-align: center;">Manage</th></tr></thead>
+                    <tbody id="history-table-body"><tr><td colspan="4" style="text-align:center; color:#999;">No history yet...</td></tr></tbody>
+                </table>
+            </div>
+        </details>
+    </div>
+
+    <div class="column-right">
+        <details class="card" id="retrain-box" open>
+            <summary>🧪 Optimize Model</summary>
+            <div class="details-content">
+                <p>Select an algorithm to train and activate.</p>
+                <div style="margin-bottom: 10px;">
+                    <select id="modelSelect">
+                        <option value="LabelSpreading">Label Spreading (Best)</option>
+                        <option value="RandomForest">Random Forest</option>
+                        <option value="DecisionTree">Decision Tree</option>
+                        <option value="GaussianNB">Gaussian NB (Worst)</option>
+                    </select>
+                </div>
+                <button onclick="toggleRetrain()" class="btn-retrain">TRAIN & ACTIVATE</button>
+                <div id="retrain-result-box" class="result-box" style="display: none;"><span id="retrain-text"></span></div>
+            </div>
+        </details>
+
+        <details class="card" id="analysis-box">
+            <summary>📊 Detailed Model Analysis</summary>
+            <div class="details-content">
+                <p>Metrics for the <b>Active Model</b>.</p>
+                <button onclick="loadAnalysis()" class="btn-analysis">LOAD METRICS</button>
+                <div id="analysis-container" style="display: none; margin-top: 20px;">
+                    <div style="margin-bottom: 15px; font-weight: bold; color: #2c3e50;">Active: <span id="active-model-name" style="color: #3498db;">-</span></div>
+                    <div class="analysis-grid">
+                        <div class="chart-box"><canvas id="metricsChart"></canvas></div>
+                        <div class="chart-box"><canvas id="confusionChart"></canvas></div>
+                    </div>
+                    <div class="insight-box" id="ai-insight">
+                        <strong>🤖 AI Performance Insight:</strong>
+                        <span id="insight-text">Analysis pending...</span>
+                    </div>
+                    <div class="history-container">
+                        <h3>📋 Classification Report</h3>
+                        <table class="styled-table">
+                            <thead><tr><th>Metric</th><th>Score</th><th>Status</th></tr></thead>
+                            <tbody>
+                                <tr><td>Accuracy</td><td id="val-acc">-</td><td id="status-acc">-</td></tr>
+                                <tr><td>Precision</td><td id="val-prec">-</td><td id="status-prec">-</td></tr>
+                                <tr><td>Recall</td><td id="val-rec">-</td><td id="status-rec">-</td></tr>
+                                <tr><td>F1 Score</td><td id="val-f1">-</td><td id="status-f1">-</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details class="card" id="batch-box">
+            <summary>📂 Batch Analysis</summary>
+            <div class="details-content">
+                <div style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; align-items: center;">
+                        <label for="csvFileInput" class="custom-file-upload"><i class="fas fa-cloud-upload-alt"></i> Choose CSV File</label>
+                        <input type="file" id="csvFileInput" accept=".csv" onchange="updateFileName()">
+                        <span id="fileNameDisplay">No file chosen</span>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="flex: 1;"><label style="font-size: 12px; font-weight: bold; color: #555;">Start:</label><input type="number" id="startSample" value="0" min="0" style="padding: 5px;"></div>
+                        <div style="flex: 1;"><label style="font-size: 12px; font-weight: bold; color: #555;">End:</label><input type="number" id="endSample" value="50" min="1" style="padding: 5px;"></div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="uploadBatch()" class="btn-batch" style="background: linear-gradient(to right, #2c3e50, #4ca1af); color: white;">DOWNLOAD CSV</button>
+                    <button onclick="visualizeSignals()" class="btn-viz" style="background: linear-gradient(to right, #ff9966, #ff5e62); color: white;">PREVIEW 📈</button>
+                </div>
+                <div id="batch-result-box" class="result-box" style="display: none;"><span id="batch-text"></span></div>
+                <div id="chart-container" style="display: none; margin-top: 20px;">
+                    <h3 style="font-size:14px; color:#555;">EEG Sensor Readings</h3>
+                    <div style="height: 300px;"> <canvas id="signalChart"></canvas></div>
+                    <div style="margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 10px;"></div>
+                    <h3 style="font-size:14px; color:#555;">Predicted Eye State</h3>
+                    <div style="height: 150px;"> <canvas id="eyeStateChart"></canvas></div>
+                </div>
+            </div>
+        </details>
+
+        <details class="card" id="diag-box">
+            <summary>🛠️ System Diagnostics</summary>
+            <div class="details-content">
+                <p>Check API & Model Status</p>
+                <button onclick="toggleDiagnostics()" class="btn-diag">RUN DIAGNOSTICS</button>
+                <div id="diag-result-box" class="result-box res-info" style="display: none;"><ul id="diag-list"></ul></div>
+            </div>
+        </details>
+    </div>
+</div>
+
+<div id="global-tooltip"></div>
+
+<div id="edit-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <h3 style="margin-top:0; color:#2c3e50;">Update Prediction</h3>
+        <p style="font-size:13px; color:#666; margin-bottom:20px;">Select the correct state for this record:</p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button class="btn-modal-option safe" onclick="confirmEdit('EYE OPEN (0)')"><i class="fas fa-eye"></i> EYE OPEN (0)</button>
+            <button class="btn-modal-option danger" onclick="confirmEdit('EYE CLOSED (1)')"><i class="fas fa-eye-slash"></i> EYE CLOSED (1)</button>
+        </div>
+        <button class="btn-modal-close" onclick="closeEditModal()">Cancel</button>
+    </div>
+</div>
+
+<script>
+    let myChart = null; let eyeStateChart = null; let metricsChart = null; let confusionChart = null; let historyCache = []; let datasetChart = null;
+    let currentEditId = null; // Düzenlenecek ID
+
+    document.addEventListener("DOMContentLoaded", function() { initDatasetStats(); });
+
+    // --- YENİ: MODAL FONKSİYONLARI ---
+    function openEditModal(id) { currentEditId = id; document.getElementById('edit-modal').style.display = 'flex'; }
+    function closeEditModal() { document.getElementById('edit-modal').style.display = 'none'; currentEditId = null; }
+    async function confirmEdit(newResult) {
+        if (currentEditId === null) return;
+        await fetch('/history_api', { method: 'PUT', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ item_id: currentEditId, new_result: newResult }) });
+        const span = document.getElementById(`res-${currentEditId}`);
+        if(span) { span.innerText = newResult; span.className = newResult.includes("CLOSED") ? "badge-danger" : "badge-safe"; }
+        closeEditModal();
+    }
+    // --- YENİ: SİLME FONKSİYONU ---
+    async function deleteRecord(id) {
+        if(!confirm("Delete this record?")) return;
+        await fetch(`/history_api/${id}`, { method: 'DELETE' });
+        const row = document.getElementById(`row-${id}`);
+        if(row) row.remove();
+    }
+
+    async function initDatasetStats() {
+        try {
+            const response = await fetch('/dataset_stats_api', { method: 'POST' });
+            const data = await response.json();
+            if(data.status === "success") {
+                document.getElementById('ds-total').innerText = data.total;
+                document.getElementById('ds-open').innerText = data.open + " (" + ((data.open/data.total)*100).toFixed(1) + "%)";
+                document.getElementById('ds-closed').innerText = data.closed + " (" + ((data.closed/data.total)*100).toFixed(1) + "%)";
+                const ctx = document.getElementById('datasetChart').getContext('2d');
+                if(datasetChart) datasetChart.destroy();
+                datasetChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: ['Open', 'Closed'], datasets: [{ data: [data.open, data.closed], backgroundColor: ['#2ecc71', '#9b59b6'], borderWidth: 0 }] },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { enabled: true } }, cutout: '70%' }
+                });
+            }
+        } catch (error) { console.error("Stats Error:", error); }
+    }
+
+    function preventSymbols(event) { if (event.key === "+" || event.key === "-" || event.key === "e" || event.key === "E") { event.preventDefault(); return false; } return true; }
+    function setValidationMsg(input) { if (input.validity.valueMissing) input.setCustomValidity('Please fill out this field'); else if (input.validity.badInput || input.validity.typeMismatch) input.setCustomValidity('Please enter a valid number'); else input.setCustomValidity(''); }
+    function updateFileName() { const input = document.getElementById('csvFileInput'); const display = document.getElementById('fileNameDisplay'); if (input.files.length > 0) { display.innerText = input.files[0].name; display.style.color = "#2c3e50"; display.style.fontWeight = "bold"; } else { display.innerText = "No file chosen"; display.style.color = "#666"; display.style.fontWeight = "normal"; } }
+
+    async function predictData(event) {
+        event.preventDefault(); 
+        const form = document.getElementById('predict-form');
+        const formData = new FormData(form);
+        const btn = form.querySelector('button');
+        btn.disabled = true; 
+        try {
+            const response = await fetch('/predict_api', { method: 'POST', body: formData });
+            const data = await response.json();
+            const resultBox = document.getElementById('predict-result-box');
+            const resultText = document.getElementById('predict-text');
+            const modelUsedText = document.getElementById('model-used-text');
+            const timeTakenText = document.getElementById('time-taken-text');
+            const title = document.getElementById('result-title');
+            const neuroBox = document.getElementById('neuro-report');
+            const neuroStateText = document.getElementById('neuro-state-text');
+            const stateDescText = document.getElementById('state-desc-text');
+            const voltageText = document.getElementById('voltage-text');
+            const warningBox = document.getElementById('signal-warning-box');
+            const warningText = document.getElementById('signal-warning-text');
+
+            resultBox.style.display = "block"; neuroBox.style.display = "none";
+            if(data.status === "error") { resultBox.className = "result-box res-error"; title.innerText = "System Error:"; resultText.innerText = data.message; modelUsedText.innerText = ""; timeTakenText.innerText = ""; btn.disabled = false; return; }
+
+            title.innerText = "Prediction Result:"; resultText.innerText = data.result; modelUsedText.innerText = "Model: " + data.model_used; timeTakenText.innerText = "Time: " + data.time_taken;
+            if (data.result.includes("CLOSED")) { resultBox.className = "result-box res-danger"; } else { resultBox.className = "result-box res-safe"; }
+            
+            neuroBox.style.display = "block"; neuroStateText.innerText = data.neuro_state; stateDescText.innerText = data.state_desc; voltageText.innerText = data.mean_voltage;
+            if (data.signal_warning) { warningBox.style.display = "block"; warningText.innerText = data.signal_warning; } else { warningBox.style.display = "none"; }
+            if (data.result.includes("CLOSED")) { neuroStateText.style.color = "#8e44ad"; } else { neuroStateText.style.color = "#e67e22"; }
+            updateHistoryTable(data.history);
+        } catch (error) { console.error(error); }
+        btn.disabled = false;
+    }
+
+    // --- GÜNCELLENEN TABLO (MODEL VE BUTONLAR EKLENDİ) ---
+    function updateHistoryTable(historyData) {
+        const tbody = document.getElementById('history-table-body');
+        tbody.innerHTML = ""; historyCache = historyData;
+        if (historyData.length === 0) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#999;">No history yet...</td></tr>'; return; }
+        historyData.forEach((item, index) => {
+            const badgeClass = item.result.includes("CLOSED") ? "badge-danger" : "badge-safe";
+            const row = `
+                <tr id="row-${item.id}">
+                    <td><b>${item.time}</b></td>
+                    <td><small>${item.model}</small></td>
+                    <td><span id="res-${item.id}" class="${badgeClass}">${item.result}</span></td>
+                    <td style="text-align: center;">
+                        <i class="fas fa-search tooltip-icon" onmouseenter="showTooltip(event, ${index})" onmousemove="moveTooltip(event)" onmouseleave="hideTooltip()" style="margin-right:8px;"></i>
+                        <i class="fas fa-edit tooltip-icon" style="color:#f39c12; margin-right:8px;" onclick="openEditModal(${item.id})"></i>
+                        <i class="fas fa-trash-alt tooltip-icon" style="color:#e74c3c;" onclick="deleteRecord(${item.id})"></i>
+                    </td>
+                </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // --- DİĞERLERİ AYNI ---
+    function getStatusBadge(score) { if (score >= 0.90) return '<span class="badge-safe">Excellent</span>'; if (score >= 0.80) return '<span class="badge-safe" style="background:#cce5ff; color:#004085;">Good</span>'; if (score >= 0.70) return '<span class="badge-warning">Fair</span>'; return '<span class="badge-danger">Poor</span>'; }
+    async function loadAnalysis() { const container = document.getElementById('analysis-container'); const btn = document.querySelector('.btn-analysis'); if (container.style.display === "block") { container.style.display = "none"; return; } btn.disabled = true; try { const response = await fetch('/model_analysis_api', { method: 'POST' }); const result = await response.json(); if (result.status === "error") { alert("⚠️ " + result.message); btn.disabled = false; return; } container.style.display = "block"; const stats = result.data; document.getElementById('active-model-name').innerText = result.model_name; document.getElementById('val-acc').innerText = (stats.accuracy * 100).toFixed(1) + "%"; document.getElementById('val-prec').innerText = (stats.precision * 100).toFixed(1) + "%"; document.getElementById('val-rec').innerText = (stats.recall * 100).toFixed(1) + "%"; document.getElementById('val-f1').innerText = (stats.f1 * 100).toFixed(1) + "%"; document.getElementById('status-acc').innerHTML = getStatusBadge(stats.accuracy); document.getElementById('status-prec').innerHTML = getStatusBadge(stats.precision); document.getElementById('status-rec').innerHTML = getStatusBadge(stats.recall); document.getElementById('status-f1').innerHTML = getStatusBadge(stats.f1); const insightText = document.getElementById('insight-text'); if (stats.accuracy >= 0.90) { insightText.innerText = "The model demonstrates Excellent performance with high reliability. It distinguishes between eye states with minimal error."; } else if (stats.accuracy >= 0.70) { insightText.innerText = "The model shows Good performance but may produce occasional errors. Consider retraining with more data for critical applications."; } else { insightText.innerText = "The model performance is Poor. The predictions are not reliable. It is highly recommended to switch to a more complex algorithm."; } const ctx1 = document.getElementById('metricsChart').getContext('2d'); if (metricsChart) metricsChart.destroy(); metricsChart = new Chart(ctx1, { type: 'bar', data: { labels: ['Accuracy', 'Precision', 'Recall', 'F1 Score'], datasets: [{ label: 'Score', data: [stats.accuracy, stats.precision, stats.recall, stats.f1], backgroundColor: ['#3498db', '#e67e22', '#2ecc71', '#9b59b6'] }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 1 } }, plugins: { title: { display: true, text: 'Performance Metrics' }, legend: { display: false } } } }); const ctx2 = document.getElementById('confusionChart').getContext('2d'); if (confusionChart) confusionChart.destroy(); confusionChart = new Chart(ctx2, { type: 'doughnut', data: { labels: ['True Neg', 'False Pos', 'False Neg', 'True Pos'], datasets: [{ data: stats.confusion, backgroundColor: ['#2ecc71', '#e74c3c', '#f1c40f', '#3498db'] }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { title: { display: true, text: 'Confusion Matrix' } } } }); } catch (error) { console.error(error); alert("Error loading analysis!"); } btn.disabled = false; }
+    function showTooltip(event, index) { const tooltip = document.getElementById('global-tooltip'); if (!historyCache || !historyCache[index] || !historyCache[index].sensors) return; const record = historyCache[index]; let sensorHtml = '<div class="tooltip-grid">'; for (const [key, value] of Object.entries(record.sensors)) { sensorHtml += `<div class="tooltip-item"><span>${key}</span><b>${value}</b></div>`; } sensorHtml += '</div>'; tooltip.innerHTML = sensorHtml; tooltip.style.display = 'block'; moveTooltip(event); }
+    function moveTooltip(event) { const tooltip = document.getElementById('global-tooltip'); const x = event.clientX + 15; const y = event.clientY + 15; tooltip.style.left = x + 'px'; tooltip.style.top = y + 'px'; }
+    function hideTooltip() { document.getElementById('global-tooltip').style.display = 'none'; }
+    async function toggleDiagnostics() { const resultBox = document.getElementById('diag-result-box'); const btn = document.querySelector('.btn-diag'); if (resultBox.style.display === "block") { resultBox.style.display = "none"; return; } resultBox.style.display = "block"; document.getElementById('diag-list').innerHTML = "<li>Loading... <i class='fas fa-spinner fa-spin'></i></li>"; btn.disabled = true; try { const response = await fetch('/diagnostics_api', { method: 'POST' }); const data = await response.json(); document.getElementById('diag-list').innerHTML = `<li>API Status: <span>${data.api_status} ✅</span></li><li>Model Loaded: <span>${data.model_loaded}</span></li><li>Current Model: <span style="color:#3498db">${data.current_model}</span></li><li>Sensors: <span>${data.sensor_channels} ch</span></li>`; } catch (error) { console.error(error); } btn.disabled = false; }
+    async function toggleRetrain() { const resultBox = document.getElementById('retrain-result-box'); const resultText = document.getElementById('retrain-text'); const btn = document.querySelector('.btn-retrain'); const selectedModel = document.getElementById('modelSelect').value; const formData = new FormData(); formData.append("model_name", selectedModel); resultBox.style.display = "block"; resultBox.className = "result-box res-info"; resultText.innerHTML = `Training <b>${selectedModel}</b>... <i class='fas fa-circle-notch fa-spin'></i>`; btn.disabled = true; try { const response = await fetch('/optimize_model_api', { method: 'POST', body: formData }); const data = await response.json(); if (data.status === "Success") { resultBox.className = "result-box res-safe"; resultText.innerHTML = `<strong>Success!</strong><br>New Accuracy: <b>${data.new_accuracy}</b><br>Samples: ${data.samples_used}`; const analysisContainer = document.getElementById('analysis-container'); if(analysisContainer) analysisContainer.style.display = "none"; } else { resultBox.className = "result-box res-danger"; resultText.innerText = "Error: " + data.message; } } catch (error) { console.error(error); resultBox.className = "result-box res-danger"; resultText.innerText = "Connection Error!"; } btn.disabled = false; }
+    async function uploadBatch() { const fileInput = document.getElementById('csvFileInput'); const resultBox = document.getElementById('batch-result-box'); const resultText = document.getElementById('batch-text'); const btn = document.querySelector('.btn-batch'); if (fileInput.files.length === 0) { alert("Please select a CSV file first!"); return; } if (resultBox.style.display === "block") { resultBox.style.display = "none"; return; } resultBox.style.display = "block"; resultBox.className = "result-box res-info"; resultText.innerHTML = "Uploading & Analyzing... <i class='fas fa-cog fa-spin'></i>"; btn.disabled = true; const formData = new FormData(); formData.append("file", fileInput.files[0]); try { const response = await fetch('/predict_batch_api', { method: 'POST', body: formData }); if (response.ok) { const blob = await response.blob(); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = "batch_results.csv"; document.body.appendChild(a); a.click(); a.remove(); resultBox.className = "result-box res-safe"; resultText.innerHTML = "<strong>Analysis Complete!</strong><br>File downloaded automatically. 📥"; } else { const errData = await response.json(); resultBox.className = "result-box res-danger"; resultText.innerText = "Error: " + errData.message; } } catch (error) { resultBox.className = "result-box res-danger"; resultText.innerText = "Connection Error!"; } btn.disabled = false; }
+    async function visualizeSignals() { const fileInput = document.getElementById('csvFileInput'); const startInput = document.getElementById('startSample').value; const endInput = document.getElementById('endSample').value; const chartContainer = document.getElementById('chart-container'); const btn = document.querySelector('.btn-viz'); if (fileInput.files.length === 0) { alert("Please select a CSV file first!"); return; } if (parseInt(startInput) >= parseInt(endInput)) { alert("Start Sample must be less than End Sample!"); return; } const originalText = btn.innerText; btn.innerText = "Drawing Chart..."; btn.disabled = true; chartContainer.style.display = "block"; const formData = new FormData(); formData.append("file", fileInput.files[0]); formData.append("start", startInput); formData.append("end", endInput); try { const response = await fetch('/visualize_batch_api', { method: 'POST', body: formData }); const data = await response.json(); if (data.status === "success") { renderCharts(data.signals, data.labels, data.eye_states); } else { alert("Error: " + data.message); } } catch (error) { console.error(error); alert("Connection Error!"); } btn.innerText = originalText; btn.disabled = false; }
+    function renderCharts(signals, labels, eyeStates) { const ctxSignal = document.getElementById('signalChart').getContext('2d'); if (myChart) myChart.destroy(); const colors = ['#FF6633', '#FFB399', '#FF33FF', '#FFFF99', '#00B3E6', '#E6B333', '#3366E6', '#999966', '#99FF99', '#B34D4D', '#80B300', '#809900', '#E6B3B3', '#6680B3', '#66991A']; const signalDatasets = []; let colorIdx = 0; for (const [sensorName, values] of Object.entries(signals)) { signalDatasets.push({ label: sensorName, data: values, borderColor: colors[colorIdx % colors.length], borderWidth: 1, fill: false, pointRadius: 1 }); colorIdx++; } myChart = new Chart(ctxSignal, { type: 'line', data: { labels: labels, datasets: signalDatasets }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } }, scales: { x: { display: false }, y: { title: { display: true, text: 'Voltage (µV)' } } }, interaction: { mode: 'nearest', intersect: false } } }); const ctxEye = document.getElementById('eyeStateChart').getContext('2d'); if (eyeStateChart) eyeStateChart.destroy(); if (eyeStates && eyeStates.length > 0) { eyeStateChart = new Chart(ctxEye, { type: 'line', data: { labels: labels, datasets: [{ label: 'Eye State', data: eyeStates, borderColor: '#2c3e50', borderWidth: 2, backgroundColor: 'rgba(44, 62, 80, 0.2)', fill: true, stepped: true, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.raw === 1 ? 'State: Eye Closed (1)' : 'State: Eye Open (0)'; } } } }, scales: { x: { title: { display: true, text: 'Samples' } }, y: { min: -0.2, max: 1.2, ticks: { stepSize: 1, callback: function(value) { if(value === 0) return 'Eye Open (0)'; if(value === 1) return 'Eye Closed (1)'; return ''; } } } } } }); } }
+</script>
+
+</body>
+</html>
